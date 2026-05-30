@@ -6,6 +6,9 @@
 * collaborating with anyone else, in conformance with the
 * NYU School of Engineering Policies and Procedures on
 * Academic Misconduct.
+*
+*Resources used: https://www.raylib.com/cheatsheet/cheatsheet.html
+*                https://www.w3schools.com/cpp/cpp_operators.asp 
 **/
 
 #include "CS3113/cs3113.h"
