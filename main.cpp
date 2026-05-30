@@ -22,6 +22,7 @@ constexpr int   SCREEN_WIDTH  = 1600 / 2,
                 SIZE_EARTH = 100,
                 SIZE_TOM = 100,
                 SIZE_STEWIE = 100,
+                SIZE_Meteor = 100,
                 FRAME_LIMIT   = 100;
 constexpr float MAX_AMP       = 10.0f;
 
@@ -32,6 +33,7 @@ constexpr Vector2 BASE_SIZE   = { (float) SIZE_SUN, (float) SIZE_SUN };
 constexpr Vector2 BASE_SIZE_earth = { (float) SIZE_EARTH, (float) SIZE_EARTH };
 constexpr Vector2 BASE_SIZE_Tom = { (float) SIZE_TOM, (float) SIZE_TOM };
 constexpr Vector2 BASE_SIZE_Stewie = { (float) SIZE_STEWIE, (float) SIZE_STEWIE };
+constexpr Vector2 BASE_SIZE_Meteor = { (float) SIZE_Meteor, (float) SIZE_Meteor };
 constexpr float RADIUS          = 160.0f, // radius of the orbit
                 ORBIT_SPEED     = 1.0f,  // the speed at which the triangle will travel its orbit
                 // BASE_SIZE       = 50,     // the size of the triangle when it's not being scaled
@@ -43,6 +45,8 @@ constexpr float RADIUS          = 160.0f, // radius of the orbit
 // Images
 constexpr char Sun_FP[] = "assets/sun.png";
 constexpr char Earth_FP[] = "assets/earthh.png";
+constexpr char Meteor_FP[] = "assets/meteor.png";
+
 constexpr char Tom_FP[] = "assets/Tom.png";
 constexpr char Stewie_FP[] = "assets/stewiebaby.png";
 
@@ -62,6 +66,14 @@ Vector2 gEarthScale = BASE_SIZE_earth;
 constexpr float LIMIT_ANGLE = 20.0f; // when turning directions will flip
 float gEarthRotation = 0.0f;
 float gOrbitAngle = 0.0f;
+
+//meteor
+Texture2D gMeteorTexture;
+Vector2 gMeteorPosition = ORIGIN;
+Vector2 gMeteorScale = BASE_SIZE_Meteor;
+float gMeteorAngle = 0.0f;
+float gMeteorRotation = 0.0f;
+
 
 // Tom
 Texture2D gTomTexture;
@@ -84,8 +96,8 @@ void shutdown();
 // Function Definitions
 void initialise()
 {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Solar System");
-
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Stewie's Solar System");
+    gMeteorTexture = LoadTexture(Meteor_FP);
     gSunTexture = LoadTexture(Sun_FP);
     gEarthTexture = LoadTexture(Earth_FP);
     gTomTexture = LoadTexture(Tom_FP);
@@ -105,34 +117,46 @@ void update()
      * @todo Calculate delta time
      */
 
-     float ticks = static_cast<float>(GetTime());
-     float deltaTime = ticks - gPreviousTicks;
-     gPreviousTicks = ticks;
+    float ticks = static_cast<float>(GetTime());
+    float deltaTime = ticks - gPreviousTicks;
+    gPreviousTicks = ticks;
  
-     gSunPulse += 1.0f * deltaTime;
-     gSunScale = {
+    gSunPulse += 1.0f * deltaTime;
+    gSunScale = {
         BASE_SIZE.x + (MAX_AMP+5.0f) * cos(gSunPulse),
         BASE_SIZE.y + (MAX_AMP+5.0f) * cos(gSunPulse)
       };
 
-      gSunPosition = {
+    gSunPosition = {
         ORIGIN.x + 20.0f * cos(gSunPulse * 0.3f),
         ORIGIN.y + 20.0f * sin(gSunPulse * 0.7f)
     }; // very slight motion, just to meet the expectations of translation.
 
-      gOrbitAngle = gOrbitAngle + (ORBIT_SPEED * deltaTime);
+    gOrbitAngle = gOrbitAngle + (ORBIT_SPEED * deltaTime);
 
-      gEarthRotation += SPIN_SPEED * deltaTime;
+    gEarthRotation += SPIN_SPEED * deltaTime;
         
 
-      gEarthPosition = {
-        ORIGIN.x + RADIUS * cos(gOrbitAngle),
-        ORIGIN.y + RADIUS * sin(gOrbitAngle)
-      };
+    gEarthPosition = {
+        gSunPosition.x + RADIUS * cos(gOrbitAngle),
+        gSunPosition.y + RADIUS * sin(gOrbitAngle)
+      }; // rotates relative to the sun position
      
-      gEarthScale = {
+    gEarthScale = {
         BASE_SIZE_earth.x + (MAX_AMP+5.0f) * cos(gSunPulse),
         BASE_SIZE_earth.y + (MAX_AMP+5.0f) * cos(gSunPulse)
+      };
+
+    gMeteorAngle += 1.5f * deltaTime; // slightly faster than the earths
+
+    gMeteorPosition = {
+        ORIGIN.x + 300.0f * cos(gMeteorAngle * 1.3f),  
+        ORIGIN.y + 200.0f  * sin(gMeteorAngle)
+    };
+    gMeteorRotation += 90.0f * deltaTime; // slow tumble
+    gMeteorScale = {
+        BASE_SIZE_Meteor.x + (MAX_AMP+20.0f) * cos(gSunPulse),
+        BASE_SIZE_Meteor.y + (MAX_AMP+20.0f) * cos(gSunPulse)
       };
 
     // Stewie is ahead
@@ -224,6 +248,32 @@ void render()
     DrawTexturePro(
         gEarthTexture, EarthTextureArea, earthDestinationArea, 
         EarthOrigin, gEarthRotation, WHITE);
+
+
+    // Drawing Meteor
+
+    Rectangle MeteorTextureArea = {
+        //top left corner
+        0.0f, 0.0f,
+        //size of earth texture
+        static_cast<float>(gMeteorTexture.width),
+        static_cast<float>(gMeteorTexture.height)
+    };
+
+    Rectangle meteorDestinationArea = {
+        gMeteorPosition.x,
+        gMeteorPosition.y,
+        static_cast<float>(gMeteorScale.x),
+        static_cast<float>(gMeteorScale.y)
+    };
+
+    Vector2 MeteorOrigin = {
+        static_cast<float>(gMeteorScale.x) / 2.0f, static_cast<float>(gMeteorScale.y)/2.0f
+    };
+
+    DrawTexturePro(
+        gMeteorTexture, MeteorTextureArea, meteorDestinationArea, 
+        MeteorOrigin, gMeteorRotation, WHITE);
 
     // Drawing Tom
 
