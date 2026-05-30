@@ -32,7 +32,7 @@ constexpr Vector2 BASE_SIZE   = { (float) SIZE_SUN, (float) SIZE_SUN };
 constexpr Vector2 BASE_SIZE_earth = { (float) SIZE_EARTH, (float) SIZE_EARTH };
 constexpr Vector2 BASE_SIZE_Tom = { (float) SIZE_TOM, (float) SIZE_TOM };
 constexpr Vector2 BASE_SIZE_Stewie = { (float) SIZE_STEWIE, (float) SIZE_STEWIE };
-constexpr float RADIUS          = 150.0f, // radius of the orbit
+constexpr float RADIUS          = 160.0f, // radius of the orbit
                 ORBIT_SPEED     = 1.0f,  // the speed at which the triangle will travel its orbit
                 // BASE_SIZE       = 50,     // the size of the triangle when it's not being scaled
                 MAX_AMPLITUDE   = 10.0f,  // by how much the triangle will be expanding/contracting
@@ -111,13 +111,13 @@ void update()
  
      gSunPulse += 1.0f * deltaTime;
      gSunScale = {
-        BASE_SIZE.x + MAX_AMP * cos(gSunPulse),
-        BASE_SIZE.y + MAX_AMP * cos(gSunPulse)
+        BASE_SIZE.x + (MAX_AMP+5.0f) * cos(gSunPulse),
+        BASE_SIZE.y + (MAX_AMP+5.0f) * cos(gSunPulse)
       };
 
       gSunPosition = {
-        ORIGIN.x + 5.0f * cos(gSunPulse * 0.3f),
-        ORIGIN.y + 5.0f * sin(gSunPulse * 0.7f)
+        ORIGIN.x + 20.0f * cos(gSunPulse * 0.3f),
+        ORIGIN.y + 20.0f * sin(gSunPulse * 0.7f)
     }; // very slight motion, just to meet the expectations of translation.
 
       gOrbitAngle = gOrbitAngle + (ORBIT_SPEED * deltaTime);
@@ -131,8 +131,8 @@ void update()
       };
      
       gEarthScale = {
-        BASE_SIZE_earth.x + MAX_AMP * cos(gSunPulse),
-        BASE_SIZE_earth.y + MAX_AMP * cos(gSunPulse)
+        BASE_SIZE_earth.x + (MAX_AMP+5.0f) * cos(gSunPulse),
+        BASE_SIZE_earth.y + (MAX_AMP+5.0f) * cos(gSunPulse)
       };
 
     // Stewie is ahead
